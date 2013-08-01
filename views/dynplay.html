@@ -1,0 +1,121 @@
+<html>
+<head>
+
+<meta charset=utf-8 />
+
+<title>Demo : jPlayer as an audio playlist player</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="description" content="The CSS styleable jQuery media player plugin with HTML5 support!" />
+<meta name="keywords" content="jPlayer, jQuery, jQuery plugin, media, video, audio, media player, video player, audio player, mp3, mp4, m4a, m4v, aac, h264, ogg, oga, ogv, wav, webm" />
+
+
+<link rel="stylesheet" href="{{=URL('static','css/jplayer.pink.flag.css')}}" type="text/css" media="all" />
+
+<script src="{{=URL('static','js/jquery-1.9.1.js')}}" type="text/javascript"></script>
+<script src="{{=URL('static','js/jquery.jplayer.min.js')}}" type="text/javascript"></script>
+<script src="{{=URL('static','js/jplayer.playlist.min.js')}}" type="text/javascript"></script>
+<script src="{{=URL('static','js/jquery.jplayer.inspector.js')}}" type="text/javascript"></script>
+<script src="{{=URL('static','js/jplayer.js')}}" type="text/javascript"></script>
+<script src="{{=URL('static','js/playlist.js')}}" type="text/javascript"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){
+	var myPlaylist = new jPlayerPlaylist({
+		jPlayer: "#the_player",
+		cssSelectorAncestor: ".playable"
+	}, 
+	[
+	],
+	{ playlistOptions: {
+     		enableRemoveControls: true
+  },
+		swfPath:"http://makeitsound.org/wp-content/themes/audiology/js/jplayer/",
+		supplied: "mp3"
+	}
+	);
+function songplay() {
+	$(".jp-playlist ul li, .jp-playlist-item").removeAttr('id', 'jp-playlist-current');
+    myPlaylist.add({title: $(this).attr("title"), mp3: $(this).attr("href"), artist: $(this).attr("data-artist")});
+	myPlaylist.play(-1);
+	$(".jp-playlist-current").attr('id', 'jp-playlist-current');
+	return false;
+}
+function songadd() {
+    myPlaylist.add({title: $(this).attr("title"), mp3: $(this).attr("href"), artist: $(this).attr("data-artist")});
+	return false;
+}
+function albumplay() {
+	 $(".jp-playlist ul li, .jp-playlist-item").removeAttr('id', 'jp-playlist-current');
+var count =  $(".jp-playlist ul li").length;
+   $(this).parent().parent().parent().find('a.songplay').each(function(){
+    myPlaylist.add({title: $(this).attr("title"), mp3: $(this).attr("href"), artist: $(this).attr("data-artist")});
+});
+myPlaylist.play(count);
+$(".jp-playlist-current").attr('id', 'jp-playlist-current');
+}
+function mainplay() {
+	 $(".jp-playlist ul li, .jp-playlist-item").removeAttr('id', 'jp-playlist-current');
+var count =  $(".jp-playlist ul li").length;
+   $(this).next().children().children().find('a.songplay').each(function(){
+    myPlaylist.add({title: $(this).attr("title"), mp3: $(this).attr("href"), artist: $(this).attr("data-artist")});
+});
+myPlaylist.play(count);
+$(".jp-playlist-current").attr('id', 'jp-playlist-current');
+}
+function albumadd() {
+   $(this).parent().parent().parent().find('a.songplay').each(function(){
+    myPlaylist.add({title: $(this).attr("title"), mp3: $(this).attr("href"), artist: $(this).attr("data-artist")});
+});
+}
+function autosearch() {
+   $("#s").val($(this).attr("data-search"));
+   $("#searchsubmit").submit();
+}
+$("#the_container").on("click", "a.songplay", songplay);
+$("#the_container").on("click", "a.albumadd", albumadd);
+$("#the_container").on("click", "a.mainplay", mainplay);
+$("#the_container").on("click", "a.albumplay", albumplay);
+$("#the_container").on("click", "a.songadd", songadd);
+$("#jp-playlist").on("click", "a.autosearch", autosearch);
+});
+</script>
+
+
+
+<body>
+
+<div id="jp_container" class="jp-audio playable">
+			<div class="jp-type-playlist">
+			<div id="the_player"></div>
+				<div class="jp-gui album_ui album_interface'.$my_post_id.'">
+					<ul class="jp-controls">
+				<li><a href="javascript:;" class="jp-play" tabindex="1"><img src="http://makeitsound.org/wp-content/themes/audiology/img/track_play.png" alt="Play" /></a></li>
+				<li><a href="javascript:;" class="jp-pause" tabindex="1"><img src="http://makeitsound.org/wp-content/themes/audiology/img/track_pause.png" alt="Pause" /></a></li>	
+				<li><a href="javascript:;" class="jp-previous" tabindex="1"><img src="http://makeitsound.org/wp-content/themes/audiology/img/track_prev.png" alt="Previous" /></a></li>
+				<li><a href="javascript:;" class="jp-next" tabindex="1"><img src="http://makeitsound.org/wp-content/themes/audiology/img/track_next.png" alt="Next" /></a></li>
+					</ul>
+					<div class="jp-progress">
+						<div class="jp-seek-bar">
+							<div class="jp-play-bar"></div>
+						</div>
+					</div>
+					<div class="jp-volume-bar">
+						<div class="jp-volume-bar-value"></div>
+					</div>
+			<ul class="jp-toggles">
+						<li><a href="javascript:;" class="jp-shuffle" tabindex="1" title="Shuffle"><img src="http://makeitsound.org/wp-content/themes/audiology/img/shuffle.png" alt="shuffle" /></a></li>
+						<li><a href="javascript:;" class="jp-shuffle-off" tabindex="1" title="Shuffle Off"><img src="http://makeitsound.org/wp-content/themes/audiology/img/shuffle-off.png" alt="shuffle-off" /></a></li>
+						<li><a href="javascript:;" class="jp-repeat" tabindex="1" title="Repeat"><img src="http://makeitsound.org/wp-content/themes/audiology/img/repeat.png" alt="repeat" /></a></li>
+						<li><a href="javascript:;" class="jp-repeat-off" tabindex="1" title="Repeat Off"><img src="http://makeitsound.org/wp-content/themes/audiology/img/repeat-off.png" alt="repeat-off" /></a></li>
+					    <li><a href="javascript:;" class="splaylist" tabindex="1" title="Show Playlist"><img src="http://makeitsound.org/wp-content/themes/audiology/img/show-playlist.png" alt="show playlist" /></a></li>
+					  </ul>
+			</div>
+			<div id="jp-playlist" class="jp-playlist">
+			<ul>
+						<li></li>
+			</ul>
+			</div>
+			</div>
+
+</body>
+</html>
