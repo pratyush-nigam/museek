@@ -9,8 +9,8 @@
 <meta name="keywords" content="jPlayer, jQuery, jQuery plugin, media, video, audio, media player, video player, audio player, mp3, mp4, m4a, m4v, aac, h264, ogg, oga, ogv, wav, webm" />
 
 
-<link rel="stylesheet" href="{{=URL('static','css/jplayer.pink.flag.css')}}" type="text/css" media="all" />
-
+<link rel="stylesheet" href="{{=URL('static','css/style.css')}}" type="text/css" />
+<link rel="stylesheet" href="{{=URL('static','css/tdomf-style-form.css')}}" type="text/css" />
 <script src="{{=URL('static','js/jquery-1.9.1.js')}}" type="text/javascript"></script>
 <script src="{{=URL('static','js/jquery.jplayer.min.js')}}" type="text/javascript"></script>
 <script src="{{=URL('static','js/jplayer.playlist.min.js')}}" type="text/javascript"></script>
@@ -29,7 +29,7 @@ $(document).ready(function(){
 	{ playlistOptions: {
      		enableRemoveControls: true
   },
-		swfPath:"http://makeitsound.org/wp-content/themes/audiology/js/jplayer/",
+		swfPath:"http://jplayer.org/latest/js",
 		supplied: "mp3"
 	}
 	);
@@ -41,6 +41,7 @@ function songplay() {
 	return false;
 }
 function songadd() {
+	alert("hello");
     myPlaylist.add({title: $(this).attr("title"), mp3: $(this).attr("href"), artist: $(this).attr("data-artist")});
 	return false;
 }
@@ -83,9 +84,10 @@ $("#jp-playlist").on("click", "a.autosearch", autosearch);
 
 
 <body>
+{{include}}
 
 <div id="jp_container" class="jp-audio playable">
-			<div class="jp-type-playlist">
+		<div class="jp-type-playlist">
 			<div id="the_player"></div>
 				<div class="jp-gui album_ui album_interface'.$my_post_id.'">
 					<ul class="jp-controls">
@@ -115,7 +117,8 @@ $("#jp-playlist").on("click", "a.autosearch", autosearch);
 						<li></li>
 			</ul>
 			</div>
-			</div>
+		</div>
+</div>
 
 </body>
 </html>
