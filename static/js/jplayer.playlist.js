@@ -400,6 +400,13 @@
 			}
 		},
 		play: function(index) {
+			alert("Hi");
+			var that = this;
+			var callMethod = function()
+    		{
+        		that.listen();
+    		}
+			setTimeout(callMethod,3000);
 			index = (index < 0) ? this.original.length + index : index; // Negative index relates to end of array.
 			if(0 <= index && index < this.playlist.length) {
 				if(this.playlist.length) {
@@ -409,6 +416,9 @@
 			} else if(index === undefined) {
 				$(this.cssSelector.jPlayer).jPlayer("play");
 			}
+		},
+		listen: function(){
+			alert("jai mata di !!!");
 		},
 		pause: function() {
 			$(this.cssSelector.jPlayer).jPlayer("pause");
