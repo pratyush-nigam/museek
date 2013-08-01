@@ -1,0 +1,16 @@
+{{left_sidebar_enabled,right_sidebar_enabled=False,('message' in globals())}}
+
+{{extend 'layout.html'}}
+{{songs=songs}}
+
+<table border="0" id="the_container">
+
+	{{for song in songs:}}
+		<tr>
+		<td>{{=song.title}}</td>
+		<td><a href="{{=URL('download',args=song.file) }}" title="{{=song.title}}" class="songplay" data-artist="abc">></a></td>
+		<td><a href="{{=URL('download',args=song.file) }}" title="{{=song.title}}" class="songadd" data-artist="abc">+</a></td>
+		</tr>	
+	{{pass}}
+
+</table>

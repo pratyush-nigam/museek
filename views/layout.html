@@ -50,8 +50,8 @@
   {{include 'web2py_ajax.html'}}
 
   {{
-  # using sidebars need to know what sidebar you want to use
-  left_sidebar_enabled = globals().get('left_sidebar_enabled',False)
+  #using sidebars need to know what sidebar you want to use
+  left_sidebar_enabled = True
   right_sidebar_enabled = globals().get('right_sidebar_enabled',False)
   middle_columns = {0:'span12',1:'span9',2:'span6'}[
     (left_sidebar_enabled and 1 or 0)+(right_sidebar_enabled and 1 or 0)]
@@ -63,6 +63,88 @@
        uncomment to load jquery-ui //-->
   <noscript><link href="{{=URL('static', 'css/web2py_bootstrap_nojs.css')}}" rel="stylesheet" type="text/css" /></noscript>
   {{block head}}{{end}}
+  
+  
+  <link rel="stylesheet" href="{{=URL('static','css/jplayer.pink.flag.css')}}" type="text/css" media="all" />
+
+<script src="{{=URL('static','js/jquery-1.9.1.js')}}" type="text/javascript"></script>
+<script src="{{=URL('static','js/jquery.jplayer.min.js')}}" type="text/javascript"></script>
+<script src="{{=URL('static','js/jplayer.playlist.min.js')}}" type="text/javascript"></script>
+<script src="{{=URL('static','js/jquery.jplayer.inspector.js')}}" type="text/javascript"></script>
+
+<script type="text/javascript">
+$(document).ready(function(event){
+    var myPlaylist = new jPlayerPlaylist({
+        jPlayer: "#jquery_jplayer_1",
+        cssSelectorAncestor: "#jp_container_1"
+    }, 
+    [
+    {
+            title:"Cro Magnon Man",
+            mp3:"http://www.jplayer.org/audio/mp3/TSP-01-Cro_magnon_man.mp3",
+            
+    }
+    ],
+    { playlistOptions: {
+            enableRemoveControls: true
+  },
+        swfPath:"http://jplayer.org/latest/js",
+        supplied: "mp3"
+    }
+    );
+    
+function songplay() {
+    alert("Hi");
+    $(".jp-playlist ul li, .jp-playlist-item").removeAttr('id', 'jp-playlist-current');
+    myPlaylist.add({title: $(this).attr("title"), mp3: $(this).attr("href"), artist: $(this).attr("data-artist")});
+    myPlaylist.play(-1);
+    $(".jp-playlist-current").attr('id', 'jp-playlist-current');
+    return false;
+}
+function songadd() {
+	alert("Hi");
+    myPlaylist.add({title: $(this).attr("title"), mp3: $(this).attr("href"), artist: $(this).attr("data-artist")});
+    return false;
+}
+function albumplay() {
+     $(".jp-playlist ul li, .jp-playlist-item").removeAttr('id', 'jp-playlist-current');
+var count =  $(".jp-playlist ul li").length;
+   $(this).parent().parent().parent().find('a.songplay').each(function(){
+    myPlaylist.add({title: $(this).attr("title"), mp3: $(this).attr("href"), artist: $(this).attr("data-artist")});
+});
+myPlaylist.play(count);
+$(".jp-playlist-current").attr('id', 'jp-playlist-current');
+}
+function mainplay() {
+     $(".jp-playlist ul li, .jp-playlist-item").removeAttr('id', 'jp-playlist-current');
+var count =  $(".jp-playlist ul li").length;
+   $(this).next().children().children().find('a.songplay').each(function(){
+    myPlaylist.add({title: $(this).attr("title"), mp3: $(this).attr("href"), artist: $(this).attr("data-artist")});
+});
+myPlaylist.play(count);
+$(".jp-playlist-current").attr('id', 'jp-playlist-current');
+}
+function albumadd() {
+   $(this).parent().parent().parent().find('a.songplay').each(function(){
+    myPlaylist.add({title: $(this).attr("title"), mp3: $(this).attr("href"), artist: $(this).attr("data-artist")});
+});
+}
+
+function autosearch() {
+   $("#s").val($(this).attr("data-search"));
+   $("#searchsubmit").submit();
+}
+
+$("#the_container").on("click", "a.songplay", songplay);
+$("#the_container").on("click", "a.albumadd", albumadd);
+$("#the_container").on("click", "a.mainplay", mainplay);
+$("#the_container").on("click", "a.albumplay", albumplay);
+$("#the_container").on("click", "a.songadd", songadd);
+$("#jp-playlist").on("click", "a.autosearch", autosearch);
+});
+</script>
+
+  
 </head>
 
 <body>
@@ -105,15 +187,59 @@
     </header>
 
     <section id="main" class="main row">
-        {{if left_sidebar_enabled:}}
+    	{{if left_sidebar_enabled:}}
         <div class="span3 left-sidebar">
-            {{block left_sidebar}}
-            <h3>Left Sidebar</h3>
-            <p></p>
-            {{end}}
+        	{{block left_sidebar}}
+            <div id="jquery_jplayer_1" class="jp-jplayer"></div>
+
+			<div id="jp_container_1" class="jp-audio">
+            	<div class="jp-type-playlist">
+                	<div class="jp-gui jp-interface" style="">
+                	    <ul class="jp-controls">
+                        <li><a href="javascript:;" class="jp-previous" tabindex="1">previous</a></li>
+                        <li><a href="javascript:;" class="jp-play" tabindex="1" style="display: none; ">play</a></li>
+                        <li><a href="javascript:;" class="jp-pause" tabindex="1" style="display: block; ">pause</a></li>
+                        <li><a href="javascript:;" class="jp-next" tabindex="1">next</a></li>
+                        <li><a href="javascript:;" class="jp-stop" tabindex="1">stop</a></li>
+                        <li><a href="javascript:;" class="jp-mute" tabindex="1" title="mute" style="">mute</a></li>
+                        <li><a href="javascript:;" class="jp-unmute" tabindex="1" title="unmute" style="display: none; ">unmute</a></li>
+                        <li><a href="javascript:;" class="jp-volume-max" tabindex="1" title="max volume" style="">max volume</a></li>
+                    	</ul>
+                    	<div class="jp-progress">
+                        <div class="jp-seek-bar" style="width: 100%; ">
+                            <div class="jp-play-bar" style="width: 87.93323566743757%; overflow: hidden; "></div>
+
+                        </div>
+                    	</div>
+                    	<div class="jp-volume-bar" style="">
+                        <div class="jp-volume-bar-value" style="width: 70%; "></div>
+                    	</div>
+                    	<div class="jp-current-time">00:00</div>
+                		<div class="jp-duration">00:00</div>
+                		<ul class="jp-toggles">
+                        <li><a href="javascript:;" class="jp-shuffle" tabindex="1" title="shuffle" style="">shuffle</a></li>
+                        <li><a href="javascript:;" class="jp-shuffle-off" tabindex="1" title="shuffle off" style="display: none; ">shuffle off</a></li>
+                        <li><a href="javascript:;" class="jp-repeat" tabindex="1" title="repeat" style="">repeat</a></li>
+                        <li><a href="javascript:;" class="jp-repeat-off" tabindex="1" title="repeat off" style="display: none; ">repeat off</a></li>
+                		</ul>
+               		</div>
+                
+                <div class="jp-playlist"  style="height:100px; overflow:auto">
+                <ul>
+                    <li></li> 
+                </ul>
+                </div>
+                <div class="jp-no-solution" style="display: none; ">
+                    <span>Update Required</span>
+                    To play the media you will need to either update your browser to a recent version or update your <a href="http://get.adobe.com/flashplayer/" target="_blank">Flash plugin</a>.
+                </div>
+            </div>
+        </div>
+        {{end}}
         </div>
         {{pass}}
-
+        
+        
         <div class="{{=middle_columns}}">
             {{block center}}
             {{include}}
