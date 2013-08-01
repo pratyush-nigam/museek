@@ -11,7 +11,7 @@
 
 if not request.env.web2py_runtime_gae:
     ## if NOT running on Google App Engine use SQLite or other DB
-    db = DAL('sqlite://storage.sqlite',pool_size=1,check_reserved=['all'])
+    db = DAL('mysql://root:@127.0.0.1/museek')
 else:
     ## connect to Google BigTable (optional 'google:datastore://namespace')
     db = DAL('google:datastore')
@@ -81,3 +81,75 @@ use_janrain(auth, filename='private/janrain.key')
 
 ## after defining tables, uncomment below to enable auditing
 # auth.enable_record_versioning(db)
+
+db.define_table('band',
+                Field('name',
+                      'string'),
+                Field('active_since',
+                      'date',
+                      requires = IS_DATE()),
+                Field('about','text',
+                      requires = IS_NOT_EMPTY()),
+                Field('location','string'),
+                Field('homepage',
+                      requires = IS_EMPTY_OR(IS_URL(mode='generic')),
+                      label = 'Home Page'),
+                Field('genres',
+                      'string',
+                      requires = IS_NOT_EMPTY()),
+                Field('influencers','string'),
+                Field('profile_image','upload',
+                      requires = IS_EMPTY_OR(IS_IMAGE(extensions=('png','bmp','jpeg','gif'))),
+                      autodelete = True)
+                )
+
+db.define_table('album',
+                Field('name','string',
+                      requires = IS_NOT_EMPTY()),
+                Field('band',
+                      writable=False,
+                      readable=False,
+                      requires=IS_IN_DB(db, db.band.id,'%(name)s'),
+                      widget = SQLFORM.widgets.autocomplete(request,
+                                                      db.band.name,
+                                                      id_field=db.band.id)),
+                Field('image','upload',
+                      requires = IS_EMPTY_OR(IS_IMAGE(extensions=('png','bmp','jpeg','gif'))),
+                      autodelete = True),
+                )
+
+db.define_table('song',
+                Field('title','string',
+                requires = IS_NOT_EMPTY()),
+                Field('file','upload',
+                      requires = IS_UPLOAD_FILENAME(extension='mp3'),
+                      autodelete = True),
+                Field('album',
+                      requires = IS_IN_DB(db,db.album.id,'%(name)s'),
+                      widget = SQLFORM.widgets.autocomplete(request,
+                                                      db.album.name,
+                                                      id_field=db.album.id)),
+                )
+
+db.define_table('listens',
+                Field('user_id',
+                      writable=False,
+                      readable=False,
+                      requires = IS_IN_DB(db,db.auth_user.id,'%(first_name)s')),
+                Field('song_id',
+                      writable=False,
+                      readable=False,
+                      requires = IS_IN_DB(db,db.auth_user.id,'%(title)s')),
+                Field('count','integer'))
+
+db.define_table('appreciate',
+                Field('song_id',
+                      db.song,
+                      requires=IS_IN_DB(db, db.song.id,'%(name)s')),
+                Field('user_id',
+                      db.auth_user,
+                      default=auth.user_id,
+                      writable=False,
+                      readable=False,
+                      requires=IS_IN_DB(db, db.auth_user.id,'%(first_name)s')),
+                )

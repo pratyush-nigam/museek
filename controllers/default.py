@@ -77,3 +77,50 @@ def data():
 
 def tester():
     return dict()
+
+@auth.requires_login()
+def list_songs():
+    songs=db().select(db.song.ALL,orderby=db.song.title)
+    return dict(songs=songs)
+
+def filter_artist(artists):
+    a = []
+    for artist in artists:
+        a.append(str(artist))
+    return a
+
+def static_rabbithole(band):
+    import pyechonest
+    artist = artist.Artist('Motherjane')#Replace with band
+    similars = a.similar[:5]
+    similar_artists = filter_artist(similars)
+    recommended_songs = []
+    for artist in similar_artists:
+        bands = db(db.band.name == artist).select(db.band.ALL,orderby=db.band.title)
+        for band in bands:
+            albums = db(db.album.band == band.id).select(db.album.ALL)
+            for album in albums:
+                songs = db(db.song.album == album.id).select(db.song.ALL)
+                recommended_songs.append(songs)
+    #Add a loop to check if user has already heard the song
+    return recommended_songs
+
+def dynamic_rabbithole(band):
+    import pyechonest
+    artist = artist.Artist('Motherjane')#Replace with band
+    similars = a.similar[:5]
+    similar_artists = filter_artist(similars)
+    recommended_songs = []
+    for artist in similar_artists:
+        bands = db(db.band.name == artist).select(db.band.ALL,orderby=db.band.title)
+        for band in bands:
+            albums = db(db.album.band == band.id).select(db.album.ALL)
+            for album in albums:
+                songs = db(db.song.album == album.id).select(db.song.ALL)
+                recommended_songs.append(songs)
+    #Add a loop to check if user has already heard the song
+    return recommended_songs
+
+def show_similar_songs():
+    #Add a check/preference for songs of band are liked by the user
+    return dict()
