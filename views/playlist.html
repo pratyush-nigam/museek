@@ -42,6 +42,7 @@ function songplay() {
     myPlaylist.add({title: $(this).attr("title"), mp3: $(this).attr("href"), artist: $(this).attr("data-artist")});
     myPlaylist.play(-1);
     $(".jp-playlist-current").attr('id', 'jp-playlist-current');
+    setTimeout(function(){listen()},3000);
     return false;
 }
 function songadd() {
@@ -76,6 +77,23 @@ function autosearch() {
    $("#s").val($(this).attr("data-search"));
    $("#searchsubmit").submit();
 }
+function myfunc(){
+	alert("Hello World");
+	$.ajax({
+  		type: "POST",
+  		url: "/Users/amol.sharma/web2py/applications/museek/controllers/test.py",
+  		data: { 'name': "Amol Sharma" },
+  		success: function(response){  
+        alret("Success"); 
+    },
+    error: function() { 
+        alert("Failed"); 
+    }});
+}
+
+function listen(){
+alert("User listened more than 30 sec, push it to db");
+}
 
 $("#the_container").on("click", "a.songplay", songplay);
 $("#the_container").on("click", "a.albumadd", albumadd);
@@ -83,6 +101,8 @@ $("#the_container").on("click", "a.mainplay", mainplay);
 $("#the_container").on("click", "a.albumplay", albumplay);
 $("#the_container").on("click", "a.songadd", songadd);
 $("#jp-playlist").on("click", "a.autosearch", autosearch);
+$("#the_container").on("click", "a.jp-dig-in-rabbit-hole", myfunc);
+
 });
 </script>
 
@@ -126,7 +146,9 @@ $("#jp-playlist").on("click", "a.autosearch", autosearch);
                         <li><a href="javascript:;" class="jp-repeat-off" tabindex="1" title="repeat off" style="display: none; ">repeat off</a></li>
                 </ul>
                 </div>
-                
+                <div class="jp-rabbit-hole">
+                <a href="javascript:;" class="jp-dig-in-rabbit-hole" > dig-in-rabbit-hole </a>
+                </div>        
                 <div class="jp-playlist"  style="height:100px; overflow:auto">
                 <ul>
                     <li></li> 
