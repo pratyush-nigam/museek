@@ -8,8 +8,8 @@
 	{{for song in songs:}}
 		<tr>
 		<td>{{=song.title}}</td>
-		<td><a href="{{=URL('download',args=song.file) }}" title="{{=song.title}}" class="songplay" data-artist="abc">></a></td>
-		<td><a href="{{=URL('download',args=song.file) }}" title="{{=song.title}}" class="songadd" data-artist="abc">+</a></td>
+		<td><a href="{{=URL('download',args=song.file) }}" uid="{{=song.id}}" title="{{=song.title}}" class="songplay" data-artist="abc">></a></td>
+		<td><a href="{{=URL('download',args=song.file) }}" uid="{{=song.id}}" title="{{=song.title}}" class="songadd" data-artist="abc">+</a></td>
 		</tr>	
 	{{pass}}
 

@@ -89,22 +89,41 @@ def filter_artist(artists):
         a.append(str(artist))
     return a
 
-def static_rabbithole(band):
-    import pyechonest
-    artist = artist.Artist('Motherjane')#Replace with band
-    similars = a.similar[:5]
-    similar_artists = filter_artist(similars)
+@auth.requires_login()
+def static_rabbithole():
+    from pyechonest import config
+    from pyechonest import artist
+    config.ECHO_NEST_API_KEY = "Q1EZUHKJSNE7GZWMT"
+    
+    listens = db(auth.user_id == db.listens.user_id).select(db.listens.ALL,orderby=~db.listens.count)
     recommended_songs = []
+    similar_artists = []
+    
+    for listen in listens:
+        songs = db(listen.song_id == db.song.id).select(db.song.ALL)
+        for song in songs:
+            albums = db(song.album == db.album.id).select(db.album.ALL)
+            for album in albums:
+                bands = db(album.band == db.band.id).select(db.band.ALL)
+                for band in bands:
+                    a = artist.Artist(band.name)
+                    #Search for duplicacy
+                    artists = filter_artist(a.similar[:5])
+                    for artist in artists:
+                        similar_artists.append(artist)
+                    
     for artist in similar_artists:
-        bands = db(db.band.name == artist).select(db.band.ALL,orderby=db.band.title)
+        bands = db(db.band.name == artist).select(db.band.ALL)
         for band in bands:
             albums = db(db.album.band == band.id).select(db.album.ALL)
             for album in albums:
                 songs = db(db.song.album == album.id).select(db.song.ALL)
-                recommended_songs.append(songs)
+                for song in songs:
+                    recommended_songs.append(song.id)
     #Add a loop to check if user has already heard the song
-    return recommended_songs
+    return dict(songs=recommended_songs)
 
+@auth.requires_login()
 def dynamic_rabbithole(band):
     import pyechonest
     artist = artist.Artist('Motherjane')#Replace with band
@@ -123,4 +142,16 @@ def dynamic_rabbithole(band):
 
 def show_similar_songs():
     #Add a check/preference for songs of band are liked by the user
+    return dict()
+
+def listen():
+    vars = request.get_vars.copy()
+    uid = int(str(vars['uid']))
+    if db((db.listens.song_id== uid) and (db.listens.user_id==auth.user_id)).isempty():
+        db.listens.insert(user_id=auth.user_id,song_id=uid,count=1)
+    else:
+        listens = db(db.listens.song_id==uid and db.listens.user_id==auth.user_id).select(db.listens.ALL)
+        for i in listens:
+            c = i.count
+            db(i.id==db.listens.id).update(count=c+1)
     return dict()

@@ -94,11 +94,14 @@ $(document).ready(function(event){
     );
     
 function songplay() {
-    alert("Hi");
+    alert("Hi" + $(this).attr("uid"));
+    var uid = $(this).attr("uid");
+    
     $(".jp-playlist ul li, .jp-playlist-item").removeAttr('id', 'jp-playlist-current');
     myPlaylist.add({title: $(this).attr("title"), mp3: $(this).attr("href"), artist: $(this).attr("data-artist")});
     myPlaylist.play(-1);
     $(".jp-playlist-current").attr('id', 'jp-playlist-current');
+    setTimeout(function(){listen(uid)},3000);
     return false;
 }
 function songadd() {
@@ -129,6 +132,33 @@ function albumadd() {
     myPlaylist.add({title: $(this).attr("title"), mp3: $(this).attr("href"), artist: $(this).attr("data-artist")});
 });
 }
+function myfunc(){
+	alert("Hello World");
+	$.ajax({
+  		type: "POST",
+  		url: "/Users/amol.sharma/web2py/applications/museek/controllers/test.py",
+  		data: { 'name': "Amol Sharma" },
+  		success: function(response){  
+        alret("Success"); 
+    },
+    error: function() { 
+        alert("Failed"); 
+    }});
+}
+
+function listen(uid){
+	alert(uid);
+	$.ajax({
+  		type: "GET",
+  		url: "{{=URL(r=request, f='listen')}}",
+  		data: { 'uid': uid },
+  		success: function(response){  
+        alert("Success"); 
+    },
+    error: function() { 
+        alert("Failed"); 
+    }});
+}
 
 function autosearch() {
    $("#s").val($(this).attr("data-search"));
@@ -141,6 +171,8 @@ $("#the_container").on("click", "a.mainplay", mainplay);
 $("#the_container").on("click", "a.albumplay", albumplay);
 $("#the_container").on("click", "a.songadd", songadd);
 $("#jp-playlist").on("click", "a.autosearch", autosearch);
+$("#the_container").on("click", "a.jp-dig-in-rabbit-hole", myfunc);
+
 });
 </script>
 
@@ -187,7 +219,7 @@ $("#jp-playlist").on("click", "a.autosearch", autosearch);
     </header>
 
     <section id="main" class="main row">
-    	{{if left_sidebar_enabled:}}
+    	{{if left_sidebar_enabled and auth.is_logged_in():}}
         <div class="span3 left-sidebar">
         	{{block left_sidebar}}
             <div id="jquery_jplayer_1" class="jp-jplayer"></div>
