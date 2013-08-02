@@ -148,3 +148,22 @@ db.define_table('appreciate',
                       readable=False,
                       requires=IS_IN_DB(db, db.auth_user.id,'%(first_name)s')),
                 )
+
+db.define_table('similar',
+                Field('song1',
+                      db.song,
+                      requires=IS_IN_DB(db, db.song.id,'%(name)s')),
+                Field('song2',
+                      db.song,
+                      requires=IS_IN_DB(db, db.song.id,'%(name)s')))
+
+db.define_table('current_song',
+                Field('user_id',
+                      db.auth_user,
+                      default=auth.user_id,
+                      writable=False,
+                      readable=False,
+                      requires=IS_IN_DB(db, db.auth_user.id,'%(first_name)s')),
+                Field('song_id',
+                      db.song,
+                      requires=IS_IN_DB(db, db.song.id,'%(name)s')))

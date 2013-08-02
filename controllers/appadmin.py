@@ -32,10 +32,10 @@ try:
 except:
     hosts = (http_host, )
 
-if request.env.http_x_forwarded_for or request.is_https:
+"""if request.env.http_x_forwarded_for or request.is_https :
     session.secure()
 elif (remote_addr not in hosts) and (remote_addr != "127.0.0.1"):
-    raise HTTP(200, T('appadmin is disabled because insecure channel'))
+    raise HTTP(200, T('appadmin is disabled because insecure channel'))"""
 
 if request.function in ('auth_manage','manage') and 'auth' in globals():
     auth.requires_membership(auth.settings.manager_group_role)(lambda: None)()

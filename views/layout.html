@@ -96,7 +96,7 @@ $(document).ready(function(event){
 function songplay() {
     alert("Hi" + $(this).attr("uid"));
     var uid = $(this).attr("uid");
-    
+    myfunc(uid);
     $(".jp-playlist ul li, .jp-playlist-item").removeAttr('id', 'jp-playlist-current');
     myPlaylist.add({title: $(this).attr("title"), mp3: $(this).attr("href"), artist: $(this).attr("data-artist")});
     myPlaylist.play(-1);
@@ -106,6 +106,8 @@ function songplay() {
 }
 function songadd() {
 	alert("Hi");
+	var uid = $(this).attr("uid");
+	myfunc(uid);
     myPlaylist.add({title: $(this).attr("title"), mp3: $(this).attr("href"), artist: $(this).attr("data-artist")});
     return false;
 }
@@ -132,12 +134,12 @@ function albumadd() {
     myPlaylist.add({title: $(this).attr("title"), mp3: $(this).attr("href"), artist: $(this).attr("data-artist")});
 });
 }
-function myfunc(){
+function myfunc(uid){
 	alert("Hello World");
 	$.ajax({
-  		type: "POST",
-  		url: "/Users/amol.sharma/web2py/applications/museek/controllers/test.py",
-  		data: { 'name': "Amol Sharma" },
+  		type: "GET",
+  		url: "{{=URL(r=request, f='dynamic_rabbithole')}}",
+  		data: { 'uid': uid },
   		success: function(response){  
         alret("Success"); 
     },
@@ -207,14 +209,7 @@ $("#the_container").on("click", "a.jp-dig-in-rabbit-hole", myfunc);
     <!-- Masthead ================================================== -->
     <header class="mastheader row" id="header">
       {{if response.title:}}
-        <div class="span12">
-            <div class="page-header">
-                <h1>
-                    {{=response.title}}
-                    <small>{{=response.subtitle or ''}}</small>
-                </h1>
-            </div>
-        </div>
+        
 	{{pass}}
     </header>
 
@@ -269,6 +264,19 @@ $("#the_container").on("click", "a.jp-dig-in-rabbit-hole", myfunc);
         </div>
         {{end}}
         </div>
+        <button class="load_content" data-url="{{=URL('default', 'load_song')}}" data-target="ajax_container">Dig into the Rabbithole</button>
+        <div id="ajax_container"> <!-- CONTENT COMES HERE --> </div>
+        <script>
+		$(function () {
+   		$('.load_content').on('click', function (e) {
+        	elem = $(this); // elem = $(e.target)
+        	url = elem.attr("data-url");
+        	target = elem.attr("data-target");
+        	web2py_ajax_page("GET", url, "", target);
+        	return false; // e.preventDefault()
+      	});
+		})
+</script>
         {{pass}}
         
         

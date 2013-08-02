@@ -109,11 +109,11 @@ def static_rabbithole():
                     a = artist.Artist(band.name)
                     #Search for duplicacy
                     artists = filter_artist(a.similar[:5])
-                    for artist in artists:
-                        similar_artists.append(artist)
+                    for artis in artists:
+                        similar_artists.append(artis)
                     
-    for artist in similar_artists:
-        bands = db(db.band.name == artist).select(db.band.ALL)
+    for artis in similar_artists:
+        bands = db(db.band.name == artis).select(db.band.ALL)
         for band in bands:
             albums = db(db.album.band == band.id).select(db.album.ALL)
             for album in albums:
@@ -124,33 +124,91 @@ def static_rabbithole():
     return dict(songs=recommended_songs)
 
 @auth.requires_login()
-def dynamic_rabbithole(band):
-    import pyechonest
-    artist = artist.Artist('Motherjane')#Replace with band
-    similars = a.similar[:5]
-    similar_artists = filter_artist(similars)
+def dynamic_rabbithole():
+    from pyechonest import config
+    from pyechonest import artist
+    config.ECHO_NEST_API_KEY = "Q1EZUHKJSNE7GZWMT"
+    
+    
+    vars = request.get_vars.copy()
+    uid = int(str(vars['uid']))
+    #Place current song in db
+    if db(auth.user_id==db.current_song.user_id).isempty():
+        db.current_song.insert(user_id=auth.user_id,song_id=uid)
+    else:
+        db(auth.user_id==db.current_song.user_id).update(song_id=uid)
+        
+    similar_artists = []
     recommended_songs = []
-    for artist in similar_artists:
-        bands = db(db.band.name == artist).select(db.band.ALL,orderby=db.band.title)
+    
+    if not db((db.similar.song1 == uid) or (db.similar.song2==uid)).isempty():
+        return dict()
+    
+    songs = db(uid == db.song.id).select(db.song.ALL)
+    for song in songs:
+        albums = db(song.album == db.album.id).select(db.album.ALL)
+        for album in albums:
+            bands = db(album.band == db.band.id).select(db.band.ALL)
+            for band in bands:
+                a = artist.Artist(band.name)
+                #Search for duplicacy
+                artists = filter_artist(a.similar[:5])
+                for artis in artists:
+                    similar_artists.append(artis)
+                    
+    for artis in similar_artists:
+        bands = db(db.band.name == artis).select(db.band.ALL)
         for band in bands:
             albums = db(db.album.band == band.id).select(db.album.ALL)
             for album in albums:
                 songs = db(db.song.album == album.id).select(db.song.ALL)
-                recommended_songs.append(songs)
+                for song in songs:
+                    recommended_songs.append(song.id)
+    #Selecting a song randomly                 
+    l = len(recommended_songs)  
+    if l == 0:
+        return dict
+    else:
+        import random
+        ind = random.randint(0,l-1)
+        db.similar.insert(song1=uid,song2=recommended_songs[ind])              
     #Add a loop to check if user has already heard the song
-    return recommended_songs
-
+    return dict()
+    
 def show_similar_songs():
     #Add a check/preference for songs of band are liked by the user
     return dict()
 
+def load_song():
+    current_song = -1
+    current = db(auth.user_id==db.current_song.user_id).select(db.current_song.ALL)
+    for c in current:
+        current_song = c.song_id
+    while current_song > 0:
+        songs = db(current_song==db.similar.song1 or current_song==db.similar.song2).select(db.similar.ALL)
+        if songs:
+            for song in songs:
+                play_song = None
+                if song.song1 == current_song:
+                    play_song = db(song.song2==db.song.id).select(db.song.ALL)
+                else:
+                    play_song = db(song.song1==db.song.id).select(db.song.ALL)
+                return dict(song=play_song)
+        else:
+            import time
+            time.sleep(1)
+    return None    
+    
+
 def listen():
-    vars = request.get_vars.copy()
-    uid = int(str(vars['uid']))
-    if db((db.listens.song_id== uid) and (db.listens.user_id==auth.user_id)).isempty():
+    uid = -1
+    current = db(auth.user_id==db.current_song.user_id).select(db.current_song.ALL)
+    for c in current:
+        uid = c.song_id
+    if db((db.listens.song_id == uid) & (db.listens.user_id==auth.user_id)).isempty():
         db.listens.insert(user_id=auth.user_id,song_id=uid,count=1)
     else:
-        listens = db(db.listens.song_id==uid and db.listens.user_id==auth.user_id).select(db.listens.ALL)
+        listens = db((db.listens.song_id==uid) & (db.listens.user_id==auth.user_id)).select(db.listens.ALL)
         for i in listens:
             c = i.count
             db(i.id==db.listens.id).update(count=c+1)
